@@ -1,0 +1,8 @@
+#logging
+Flask[async]
+python-dotenv
+asyncio
+aiohttp
+aiofiles
+flask-cors
+
