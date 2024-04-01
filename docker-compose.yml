@@ -12,4 +12,4 @@ services:
     env_file:
       - .env  
     volumes:
-      - ./logs:/app/logs   # Mapping local folder 'logs' to container's 'logs' folder
+      - ./data:/app/data   # Mapping local folder 'data' to container's 'data' folder

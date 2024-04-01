@@ -81,7 +81,11 @@ http://127.0.0.1:5000/meme/crypto
 
 3. Generate Memes Given an image and a text string (optional)
 
-- In Progress
+- Endpoint: http://127.0.0.1:5000/makememe/
+- Parameter: see picture of postman call below
+- Type: POST
+
+![Image Description](data/postman.png)
 
 ## Docker Deployment
 You can also deploy RandomMemeGenerator using Docker.

@@ -1,51 +1,7 @@
-import PIL
-from PIL import ImageFont
-from PIL import Image
-from PIL import ImageDraw
-
+import os
 import sys
-
-
-def make_meme(topString, bottomString, filename):
-
-	img = Image.open(filename)
-	imageSize = img.size
-
-	# find biggest font size that works
-	fontSize = int(imageSize[1]/5)
-	font = ImageFont.truetype("./data/fonts/impact.ttf", fontSize)
-	topTextSize = font.getsize(topString)
-	bottomTextSize = font.getsize(bottomString)
-	while topTextSize[0] > imageSize[0]-20 or bottomTextSize[0] > imageSize[0]-20:
-		fontSize = fontSize - 1
-		font = ImageFont.truetype("./data/fonts/impact.ttf", fontSize)
-		topTextSize = font.getsize(topString)
-		bottomTextSize = font.getsize(bottomString)
-
-	# find top centered position for top text
-	topTextPositionX = (imageSize[0]/2) - (topTextSize[0]/2)
-	topTextPositionY = 0
-	topTextPosition = (topTextPositionX, topTextPositionY)
-
-	# find bottom centered position for bottom text
-	bottomTextPositionX = (imageSize[0]/2) - (bottomTextSize[0]/2)
-	bottomTextPositionY = imageSize[1] - bottomTextSize[1]
-	bottomTextPosition = (bottomTextPositionX, bottomTextPositionY)
-
-	draw = ImageDraw.Draw(img)
-
-	# draw outlines
-	# there may be a better way
-	outlineRange = int(fontSize/15)
-	for x in range(-outlineRange, outlineRange+1):
-		for y in range(-outlineRange, outlineRange+1):
-			draw.text((topTextPosition[0]+x, topTextPosition[1]+y), topString, (0,0,0), font=font)
-			draw.text((bottomTextPosition[0]+x, bottomTextPosition[1]+y), bottomString, (0,0,0), font=font)
-
-	draw.text(topTextPosition, topString, (255,255,255), font=font)
-	draw.text(bottomTextPosition, bottomString, (255,255,255), font=font)
-
-	img.save("temp.png")
+import logging
+from PIL import Image, ImageDraw, ImageFont
 
 def get_upper(somedata):
 	'''
@@ -70,6 +26,166 @@ def get_lower(somedata):
 
 	return result
 
+def make_meme(topString, topTextPosition, bottomString, bottomTextPosition, filename, logging):
+    try:
+        img = Image.open(filename)
+    except Exception as e:
+        logging.error(str(e))
+        return False, "Failed to open image file."
+
+    topString = get_lower(topString)
+    bottomString = get_lower(bottomString)
+    imageSize = img.size
+    draw = ImageDraw.Draw(img)
+    # find biggest font size that works
+    fontSize = int(imageSize[1] / 8)
+    font = ImageFont.truetype("./data/fonts/impact.ttf", fontSize)
+    logofont = ImageFont.truetype("./data/fonts/ceribri.ttf", 12)
+    # topTextSize = font.font.getsize(topString)
+    # bottomTextSize = font.font.getsize(bottomString)
+
+    # while topTextSize[0][0] > imageSize[0]-20 or bottomTextSize[0][0] > imageSize[0]-20:
+    #     fontSize -= 1
+    #     font = ImageFont.truetype("./data/fonts/impact.ttf", fontSize)
+    #     topTextSize = font.font.getsize(topString)
+    #     bottomTextSize = font.font.getsize(bottomString)
+		
+
+    # # find top centered position for top text
+    # topTextPositionX = (imageSize[0] / 2) - (topTextSize[0][0] / 2)
+    # topTextPositionY = 0
+    # topTextPosition = (topTextPositionX, topTextPositionY)
+
+    # # find bottom centered position for bottom text
+    # bottomTextPositionX = (imageSize[0] / 2) - (bottomTextSize[0][0] / 2)
+    # bottomTextPositionY = imageSize[1] - bottomTextSize[1][1]
+    # bottomTextPosition = (bottomTextPositionX, bottomTextPositionY)
+
+    # draw outlines
+    outlineRange = int(fontSize / 15)
+    for x in range(-outlineRange, outlineRange + 1):
+        for y in range(-outlineRange, outlineRange + 1):
+            draw.text((topTextPosition[0] + x, topTextPosition[1] + y), topString, (0, 0, 0), font=font)
+            draw.text((bottomTextPosition[0] + x, bottomTextPosition[1] + y), bottomString, (0, 0, 0), font=font)
+
+    draw.text(topTextPosition, topString, (255, 255, 255), font=font)
+    draw.text(bottomTextPosition, bottomString, (255, 255, 255), font=font)
+
+    logoTextPosition = (imageSize[0] - 80, imageSize[1] - 20)
+    draw.text(logoTextPosition, "coinchance.io", (0, 0, 0), font=logofont)
+	
+    directory, file = os.path.split(filename)
+    img_path = os.path.join('data', 'images', 'output', file)
+    #img_path = "./data/temp/temp.png"
+    img.save(img_path)
+    return True, img_path
+
+def make_meme2(topString, bottomString, filename, logging):
+    try:
+        img = Image.open(filename)
+    except Exception as e:
+        logging.error(str(e))
+        return False, "Failed to open image file."
+
+    topString = get_lower(topString)
+    bottomString = get_lower(bottomString)
+    imageSize = img.size
+    draw = ImageDraw.Draw(img)
+    # find biggest font size that works
+    fontSize = int(imageSize[1] / 5)
+    font = ImageFont.truetype("./data/fonts/impact.ttf", fontSize)
+    logofont = ImageFont.truetype("./data/fonts/ceribri.ttf", 12)
+    topTextSize = font.font.getsize(topString)
+    bottomTextSize = font.font.getsize(bottomString)
+
+    while topTextSize[0][0] > imageSize[0]-20 or bottomTextSize[0][0] > imageSize[0]-20:
+        fontSize -= 1
+        font = ImageFont.truetype("./data/fonts/impact.ttf", fontSize)
+        topTextSize = font.font.getsize(topString)
+        bottomTextSize = font.font.getsize(bottomString)
+		
+
+    # find top centered position for top text
+    topTextPositionX = (imageSize[0] / 2) - (topTextSize[0][0] / 2)
+    topTextPositionY = 0
+    topTextPosition = (topTextPositionX, topTextPositionY)
+
+    # find bottom centered position for bottom text
+    bottomTextPositionX = (imageSize[0] / 2) - (bottomTextSize[0][0] / 2)
+    bottomTextPositionY = imageSize[1] - bottomTextSize[1][1]
+    bottomTextPosition = (bottomTextPositionX, bottomTextPositionY)
+
+    # draw outlines
+    outlineRange = int(fontSize / 15)
+    for x in range(-outlineRange, outlineRange + 1):
+        for y in range(-outlineRange, outlineRange + 1):
+            draw.text((topTextPosition[0] + x, topTextPosition[1] + y), topString, (0, 0, 0), font=font)
+            draw.text((bottomTextPosition[0] + x, bottomTextPosition[1] + y), bottomString, (0, 0, 0), font=font)
+
+    draw.text(topTextPosition, topString, (255, 255, 255), font=font)
+    draw.text(bottomTextPosition, bottomString, (255, 255, 255), font=font)
+
+    logoTextPosition = (imageSize[0] - 100, imageSize[1] - 30)
+    draw.text(logoTextPosition, "coinchance.io", (255, 255, 255), font=logofont)
+	
+    directory, file = os.path.split(filename)
+    img_path = os.path.join('images', 'output', file)
+    #img_path = "./data/temp/temp.png"
+    img.save(img_path)
+    return True, img_path
+
+
+# def make_meme(topString, bottomString, filename, logging):
+# 	try:
+# 		img = Image.open(filename)
+# 	except Exception as e:
+# 		logging.error(str(e))
+# 		return False, None
+# 	imageSize = img.size
+# 	print(imageSize)
+# 	draw = ImageDraw.Draw(img)
+# 	# find biggest font size that works
+# 	fontSize = int(imageSize[1]/5)
+# 	font = ImageFont.truetype("./data/fonts/impact.ttf", fontSize)
+# 	logofont = ImageFont.truetype("./data/fonts/ceribri.ttf", 12)
+# 	topTextSize = font.font.getsize(topString)
+# 	bottomTextSize = font.font.getsize(bottomString)
+
+# 	while topTextSize[0][0] > imageSize[0]-20 or bottomTextSize[0][0] > imageSize[0]-20:
+# 		fontSize = fontSize - 1
+# 		font = ImageFont.truetype("./data/fonts/impact.ttf", fontSize)
+# 		topTextSize = font.font.getsize(topString)
+# 		bottomTextSize = font.font.getsize(bottomString)
+
+# 	# find top centered position for top text
+# 	topTextPositionX = (imageSize[0]/2) - (topTextSize[0][0]/2)
+# 	topTextPositionY = 0
+# 	topTextPosition = (topTextPositionX, topTextPositionY)
+
+# 	# find bottom centered position for bottom text
+# 	bottomTextPositionX = (imageSize[0]/2) - (bottomTextSize[0][0]/2)
+# 	bottomTextPositionY = imageSize[1] - bottomTextSize[1][1]
+# 	bottomTextPosition = (bottomTextPositionX, bottomTextPositionY)
+
+	
+
+# 	# draw outlines
+# 	# there may be a better way
+# 	outlineRange = int(fontSize/15)
+# 	for x in range(-outlineRange, outlineRange+1):
+# 		for y in range(-outlineRange, outlineRange+1):
+# 			draw.text((topTextPosition[0]+x, topTextPosition[1]+y), topString, (0,0,0), font=font)
+# 			draw.text((bottomTextPosition[0]+x, bottomTextPosition[1]+y), bottomString, (0,0,0), font=font)
+
+# 	draw.text(topTextPosition, topString, (255,255,255), font=font)
+# 	draw.text(bottomTextPosition, bottomString, (255,255,255), font=font)
+
+# 	logoTextPosition = (imageSize[0]-100, imageSize[1]-30)
+# 	draw.text(logoTextPosition, "coinchance.io", (255,255,255), font=logofont)
+
+# 	img.save("./data/temp/temp.png")
+# 	return True, "./data/temp/temp.png"
+
 
 
 if __name__ == '__main__':
@@ -80,6 +196,10 @@ if __name__ == '__main__':
 
 	if args_len == 1:
 		# no args except the launch of the script
+		bottomString = get_upper("Meme World")
+		topString = get_upper("Hello")
+		meme = get_lower("./meme_250675.png")
+		 
 		print('args plz')
 
 	elif args_len == 2:
@@ -103,5 +223,6 @@ if __name__ == '__main__':
 		print('to many argz')
 
 	print(meme)	
-	filename = str(meme)+'.jpg'
+	#filename = str(meme)+'.jpg'
+	filename = str(meme)
 	make_meme(topString, bottomString, filename)	

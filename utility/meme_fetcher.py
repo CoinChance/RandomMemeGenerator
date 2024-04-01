@@ -34,6 +34,14 @@ topics_accepted = {
     ]
 }
 
+# Define function to check if a post is an image
+async def is_image_post(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.head(url) as response:
+            content_type = response.headers.get("Content-Type", "")
+            return content_type.startswith("image/")
+
+SUBREDDITS = ["CryptoCurrencyMemes", "CryptoMemes"]
 
 async def get_meme(subreddit, logging):
     """Gets a meme from reddit from the subreddit provided"""
@@ -47,29 +55,46 @@ async def get_meme(subreddit, logging):
         logging.info('subreddit selected: ')
         logging.info(subreddit)
         while meme_not_found and max_tries > 0:
-            top_or_other = random.randint(0, 1)
-            if top_or_other == 0:
-                async with session.get(
-                    f"https://www.reddit.com/r/{subreddit}/{random.choice(['hot', 'new'])}.json"
-                ) as response:
-                    data = await response.json()
-            else:
-                async with session.get(
-                    f"https://www.reddit.com/r/{subreddit}/top.json?t={random.choice(['hour','day', 'week', 'month', 'year'])}"
-                ) as response:
-                    data = await response.json()
+            # top_or_other = random.randint(0, 1)
+            # if top_or_other == 0:
+            #     async with session.get(
+            #         f"https://www.reddit.com/r/{subreddit}/{random.choice(['hot', 'new'])}.json"
+            #     ) as response:
+            #         data = await response.json()
+            # else:
+            #     async with session.get(
+            #         f"https://www.reddit.com/r/{subreddit}/top.json?t={random.choice(['hour','day', 'week', 'month', 'year'])}"
+            #     ) as response:
+            #         data = await response.json()
 
-            try:
-                meme = random.choice(data["data"]["children"])
-                reply= meme["data"]
-                url= meme["data"]["url"]
-                if not any([
-                    url.endswith("png"),
-                    url.endswith("jpg"),
-                    url.endswith("jpeg"),
-                    url.endswith("gif"),
-                    ]):
-                    continue
+            subreddit = random.choice(SUBREDDITS)
+            sort_type = random.choice(["hot", "new", "top"])
+
+            # Use Reddit's filter for listing only images
+            async with session.get(
+                f"https://www.reddit.com/r/{subreddit}/{sort_type}.json?sort=rising&restrict_sr=on&img=on"
+            ) as response:
+                data = await response.json()
+
+            
+
+            try:                
+                # meme = random.choice(data["data"]["children"])
+                # reply= meme["data"]
+                # url= meme["data"]["url"]
+                # if not any([
+                #     url.endswith("png"),
+                #     url.endswith("jpg"),
+                #     url.endswith("jpeg"),
+                #     url.endswith("gif"),
+                #     ]):
+                #     continue
+
+                for post in data.get("data", {}).get("children", []):
+                    url = post.get("data", {}).get("url")
+                    meme= random.choice(data["data"]["children"])
+                    reply= meme["data"]
+                   
                 logging.info(reply)
                 return reply
             except KeyError:

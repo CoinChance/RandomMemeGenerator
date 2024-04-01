@@ -5,4 +5,5 @@ asyncio
 aiohttp
 aiofiles
 flask-cors
+Pillow
 
